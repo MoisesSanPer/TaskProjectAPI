@@ -72,9 +72,9 @@ namespace TaskAPI.Services
         {
             return  await _userRepository.DeleteCategory(idCategory,isAll);
         }
-        public async Task<HttpStatusCode> DeleteTag(string idTag)
+        public async Task<HttpStatusCode> DeleteTag(string idTag, bool isAll)
         {
-            return await _userRepository.DeleteTag(idTag);
+            return await _userRepository.DeleteTag(idTag,isAll);
         }
         public async Task<models.Category> UpdateCategory(string id, string title, string idUser)
         {

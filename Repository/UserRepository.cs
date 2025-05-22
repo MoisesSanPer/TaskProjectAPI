@@ -172,7 +172,7 @@ namespace TaskAPI.Repository
             var result = await container.DeleteItemAsync<models.Category>(idCategory, new PartitionKey(idCategory));
             return result.StatusCode;
         }
-        public async Task<HttpStatusCode> DeleteTag(string idTag)
+        public async Task<HttpStatusCode> DeleteTag(string idTag, bool isAll)
         {
             var container = _cosmosClient.GetContainer("TaskProject", "Tag");
             var taskContainer = _cosmosClient.GetContainer("TaskProject", "Tasks");
@@ -187,7 +187,14 @@ namespace TaskAPI.Repository
                 {
                     task.Tags = task.Tags?.Where(tag => tag.Id != idTag).ToArray();
 
-                    await taskContainer.ReplaceItemAsync(task,task.Id,new PartitionKey(task.Id));
+                    if (isAll == true)
+                    {
+                        await taskContainer.ReplaceItemAsync(task, task.Id, new PartitionKey(task.Id));
+                    }
+                    else
+                    {
+                        await taskContainer.DeleteItemAsync<models.Task>(task.Id, new PartitionKey(task.Id));
+                    }
                 }
             }
             var result = await container.DeleteItemAsync<models.Tag>(idTag, new PartitionKey(idTag));

@@ -21,7 +21,7 @@ namespace TaskAPI.Repository
         public Task<List<models.Category>> GetCategory(string idUser);
         public Task<List<models.Tag>> GetTags(string idUser);
         public Task<HttpStatusCode> DeleteCategory(string idCategory,bool isAll);
-        public Task<HttpStatusCode> DeleteTag(string idTag);
+        public Task<HttpStatusCode> DeleteTag(string idTag, bool isAll);
         public Task<models.Category> UpdateCategory(string id, string title, string idUser);
         public Task<models.Tag> UpdateTag(string id, string title, string idUser);
         public Task<List<models.Task>> GetTasks(string idUser);

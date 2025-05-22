@@ -30,9 +30,19 @@ namespace TaskAPI.Functions
         {
             var queryParams = HttpUtility.ParseQueryString(req.Url.Query);
             var tagId = queryParams["id"];
+            var tagBool = queryParams["isAll"];
+            bool booleantag;
+            if (tagBool == "true")
+            {
+                booleantag = true;
+            }
+            else
+            {
+                booleantag = false;
+            }
             var response = req.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/json; c-harset=utf-8");
-            var Category = await _userService.DeleteTag(tagId!);
+            var Category = await _userService.DeleteTag(tagId!, booleantag!);
             return Category;
         }
     }
