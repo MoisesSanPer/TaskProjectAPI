@@ -38,26 +38,26 @@ namespace TaskAPI.Repository
         }
 
 
-        public async Task<models.User> GetUserById(string id)
+        public Task<models.User> GetUserById(string id)
         {
             var container = _cosmosClient.GetContainer("TaskProject", "Users");
             var user = container.GetItemLinqQueryable<models.User>().Where(c => c.Id == id).FirstOrDefault();
             if(user != null)
             {
-                return  user;
+                return System.Threading.Tasks.Task.FromResult(user);
             }
-            return null!;
+            return System.Threading.Tasks.Task.FromResult<models.User>(null!);
         }
 
-        public async Task<models.User> Login(string email, string password)
+        public async Task< models.User> Login(string email, string password)
         {
-            var container = _cosmosClient.GetContainer("TaskProject", "Users");
-            var user = container.GetItemLinqQueryable<models.User>().Where(c => c.Email == email && c.Password == password).FirstOrDefault();
-            if(user != null)
-            {
+                var container =  _cosmosClient.GetContainer("TaskProject", "Users");
+                var user =  container.GetItemLinqQueryable<models.User>().Where(c => c.Email == email && c.Password == password).FirstOrDefault();
+                if (user != null)
+                {
                 return user;
-            }
-            return null!;
+                }
+                throw new Exception("User not found"); 
         }
 
         public async  Task<models.User> Register(string username, string email, string password)

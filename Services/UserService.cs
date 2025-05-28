@@ -32,13 +32,20 @@ namespace TaskAPI.Services
 
         public async  Task<models.User> Login(string email, string password)
         {
-            var user = await  _userRepository.Login(email, password);
-            if (user != null)
+            try
             {
-                user.Token = GenerateToken(email);
-                return user;
+                var user = await _userRepository.Login(email, password);
+                if (user != null)
+                {
+                    user.Token = GenerateToken(email);
+                    return user;
+                }
+                throw new Exception();
             }
-            return null!;
+            catch(Exception e)
+            {
+                throw;
+            }
         }
 
         public  async Task<models.User> Register(string username,string email ,string password)

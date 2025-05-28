@@ -25,16 +25,25 @@ namespace TaskAPI.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req,
             FunctionContext executionContext)
         {
-            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var userData = JsonSerializer.Deserialize<models.User>(requestBody);
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "text/json; charset=utf-8");
-            var userTask = _userService.Login(userData!.Email, userData.Password);
-            var user = await userTask;
-            var userJson = JsonSerializer.Serialize(user);
-            await response.WriteStringAsync(userJson);
-            Console.WriteLine("The response2 is " + userJson);
-            return response;
+            try
+            {
+                var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                var userData = JsonSerializer.Deserialize<models.User>(requestBody);
+                var response = req.CreateResponse(HttpStatusCode.OK);
+                response.Headers.Add("Content-Type", "text/json; charset=utf-8");
+                var userTask = _userService.Login(userData!.Email, userData.Password);
+                var user = await userTask;
+                var userJson = JsonSerializer.Serialize(user);
+                await response.WriteStringAsync(userJson);
+                Console.WriteLine("The response2 is " + userJson);
+                return response;
+            }
+            catch(Exception e)
+            {
+                var responseNotFound = req.CreateResponse(HttpStatusCode.NotFound);
+                return responseNotFound;
+            }
+
         }
     }
 }
