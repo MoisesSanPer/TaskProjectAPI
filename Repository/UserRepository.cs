@@ -49,7 +49,7 @@ namespace TaskAPI.Repository
             return System.Threading.Tasks.Task.FromResult<models.User>(null!);
         }
 
-        public async Task< models.User> Login(string email, string password)
+        public async Task<models.User> Login(string email, string password)
         {
                 var container =  _cosmosClient.GetContainer("TaskProject", "Users");
                 var user =  container.GetItemLinqQueryable<models.User>().Where(c => c.Email == email && c.Password == password).FirstOrDefault();
@@ -186,7 +186,6 @@ namespace TaskAPI.Repository
                 foreach(var task in  await query.ReadNextAsync())
                 {
                     task.Tags = task.Tags?.Where(tag => tag.Id != idTag).ToArray();
-
                     if (isAll == true)
                     {
                         await taskContainer.ReplaceItemAsync(task, task.Id, new PartitionKey(task.Id));
@@ -204,14 +203,41 @@ namespace TaskAPI.Repository
         public async Task<Category> UpdateCategory(string id, string title, string idUser)
         {
             var container = _cosmosClient.GetContainer("TaskProject", "Category");
+            var taskcontainer = _cosmosClient.GetContainer("TaskProject", "Tasks");
+
+            var query = taskcontainer.GetItemLinqQueryable<models.Task>()
+               .Where(t => t.Categories != null && t.Categories.Any(cat => cat.Id == id))
+               .ToFeedIterator();
             var  category = new Category(id, title, idUser);
+            while (query.HasMoreResults)
+            {
+                foreach (var task in await query.ReadNextAsync())
+                {
+                        task.Categories?.SetValue(category,0);
+                    await taskcontainer.ReplaceItemAsync(task, task.Id, new PartitionKey(task.Id));
+
+                }
+            }
             var result = await container.ReplaceItemAsync<models.Category>(category, category.Id, new PartitionKey(category.Id));
             return result;
         }
         public async Task<Tag> UpdateTag(string id, string title, string idUser)
         {
             var container = _cosmosClient.GetContainer("TaskProject", "Tag");
+            var taskcontainer = _cosmosClient.GetContainer("TaskProject", "Tasks");
+            var query = taskcontainer.GetItemLinqQueryable<models.Task>()
+             .Where(t => t.Tags != null && t.Tags.Any(tag => tag.Id == id))
+             .ToFeedIterator();
             var tag = new Tag(id, title, idUser);
+            while (query.HasMoreResults)
+            {
+                foreach (var task in await query.ReadNextAsync())
+                {
+                    task.Tags?.SetValue(tag, 0);
+                    await taskcontainer.ReplaceItemAsync(task, task.Id, new PartitionKey(task.Id));
+
+                }
+            }
             var result = await container.ReplaceItemAsync<models.Tag>(tag, tag.Id, new PartitionKey(tag.Id));
             return result;
         }

@@ -38,7 +38,7 @@ namespace TaskAPI.Functions
                 Console.WriteLine("The response2 is " + userJson);
                 return response;
             }
-            catch(Exception e)
+            catch(Exception )
             {
                 var responseNotFound = req.CreateResponse(HttpStatusCode.NotFound);
                 return responseNotFound;
